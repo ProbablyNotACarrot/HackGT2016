@@ -1,5 +1,5 @@
 import requests
-from settings import API_KEY
+import settings
 
 # requires settings.py containing:
 # API_KEY = "YOUR_API_KEY"
@@ -11,10 +11,8 @@ class GoogleTranslateSession(object):
 
 	def translate(self, sourceLanguage, targetLanguage, text):
 		url = ("https://www.googleapis.com/language/translate/v2?key=%s" +
-				"&source=%s&target=%s&callback=translateText&q=%s") % (sourceLanguage,
-				targetLanguage, self.API_KEY, text)
+				"&source=%s&target=%s&q=%s&client=p") % (self.API_KEY, 
+				sourceLanguage, targetLanguage, text)
 
-		return requests.get(url).json()
-
-g = GoogleTranslateSession(API_KEY)
-print g.translate("en", "de", "Hello")
+		return requests.get(url).json()["data"]["translations"][0]["translatedText"]
+print repr(GoogleTranslateSession(settings.API_KEY).translate("en", "de", "Hello world"))
