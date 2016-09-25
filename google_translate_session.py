@@ -1,5 +1,7 @@
 import requests
 import settings
+from GoogleTTS import audio_extract
+translatedAudio = audio_extract(input_text='tunnel snakes rule apparently', args = {'language':'en','output':'outputto.mp3'})
 
 # requires settings.py containing:
 # API_KEY = "YOUR_API_KEY"
@@ -15,4 +17,5 @@ class GoogleTranslateSession(object):
 				sourceLanguage, targetLanguage, text)
 
 		return requests.get(url).json()["data"]["translations"][0]["translatedText"]
-print repr(GoogleTranslateSession(settings.API_KEY).translate("en", "de", "Hello world"))
+
+print GoogleTranslateSession(settings.API_KEY).translate("en", "fr", "Hello world")
