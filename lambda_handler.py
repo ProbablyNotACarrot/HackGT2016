@@ -50,7 +50,7 @@ def get_welcome_response():
 
     session_attributes = {}
     card_title = "Welcome"
-    speech_output = "Welcome to Alexa Translate. What language would you like to translate from?"
+    speech_output = "Welcome to Alexa Translate. What language would you like to translate to?"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "I didn't catch that. Could you repeat it?"
@@ -95,9 +95,26 @@ def set_language_in_session(intent, session):
         speech_output = "I'm not sure what your target language is, " \
                         "Please try again."
         reprompt_text = "I didn't catch that, could you repeat it?"
+
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
+def create_speech_attributes(speech):
+    return {"speech": speech}
+
+def set_speech_in_session(intent, session):
+    card_title = intent['name']
+    session_attributes = {}
+    should_end_session = False
+
+    user_speech = intent['value']
+    session_attributes = create_speech_attributes(user_speech)
+    speech_output = "The inputted speech to translate is" + \
+                    user_speech
+    reprompt_text = ""
+
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
 
 def get_language_from_session(intent, session):
     session_attributes = {}
@@ -107,7 +124,7 @@ def get_language_from_session(intent, session):
         target_language = session['attributes']['targetLanguage']
         speech_output = "Your target language is " + target_language + \
                         ". Goodbye."
-        should_end_session = True
+        should_end_session = False
     else:
         speech_output = "I didn't catch that, could you repeat it?"
         should_end_session = False
@@ -117,7 +134,6 @@ def get_language_from_session(intent, session):
     # understood, the session will end.
     return build_response(session_attributes, build_speechlet_response(
         intent['name'], speech_output, reprompt_text, should_end_session))
-
 
 # --------------- Events ------------------
 
@@ -151,8 +167,10 @@ def on_intent(intent_request, session):
     # Dispatch to your skill's intent handlers
     if intent_name == "TargetLangIntent":
         return set_language_in_session(intent, session)
-    elif intent_name == "WhatsMyLanguageIntent":
-        return get_language_from_session(intent, session)
+    elif intent_name == "SpeechIntent":
+        return set_speech_in_session(intent, session)
+    #elif intent_name == "WhatsMyLanguageIntent":
+        #return get_language_from_session(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
